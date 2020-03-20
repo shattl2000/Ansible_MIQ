@@ -1,0 +1,87 @@
+---
+- name: Prerequisites configuration k8s node and join to cluster
+  hosts: workers
+  become: yes
+
+  tasks:
+  - name: Install Docker
+    yum: name=docker state=latest
+
+  - name: Start and Enable Docker
+    service: name=docker state=started enabled=yes
+
+  - name: SELinux disabled
+    selinux:
+      state: disabled
+
+  - name: Disabled firewall
+    service: name=firewalld state=stopped enabled=no
+
+  - name: Reboot system
+    reboot:
+
+  - name: Remove swapfile from /etc/fstab
+    mount:
+      name: swap
+      fstype: swap
+      state: absent
+
+  - name: Disable SWAP
+    shell: |
+      swapoff -a
+
+  - name: Add k8s.conf
+    shell:
+      cmd: |
+        cat <<EOF > /etc/sysctl.d/k8s.conf
+        net.bridge.bridge-nf-call-ip6tables = 1
+        net.bridge.bridge-nf-call-iptables = 1
+        EOF
+        sysctl --system
+
+  - name: Add repos kube
+    shell:
+      cmd: |
+        cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+        [kubernetes]
+        name=Kubernetes
+        baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        enabled=1
+        gpgcheck=1
+        repo_gpgcheck=1
+        gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        EOF
+
+  - name: Install Kubeadm packages
+    yum:
+      name:
+        - kubeadm
+        - kubelet
+        - kubectl
+      state: present
+
+  - name: Start and Enable Kubelet
+    service: name=kubelet state=started enabled=yes
+
+- name: Join node
+  hosts: masters
+  become_user: origin
+  gather_facts: false
+
+  tasks:
+  - name: Get join command
+    shell: kubeadm token create --print-join-command
+    register: join_command_raw
+  - name: set join command
+    set_fact:
+      join_command: "{{ join_command_raw.stdout_lines[0] }}"
+
+- hosts: workers
+  become: yes
+
+  tasks:
+  - name: Join cluster
+    shell: "{{ hostvars['k8s-m.dvslab.local'].join_command }} >> node_joined.txt"
+    args:
+      chdir: $HOME
+      creates: node_joined.txt
