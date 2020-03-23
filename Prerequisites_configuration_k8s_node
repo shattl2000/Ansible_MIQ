@@ -1,6 +1,6 @@
 ---
 - name: Prerequisites configuration k8s node and join to cluster
-  hosts: workers
+  hosts: localhost
   become: yes
 
   tasks:
