@@ -1,0 +1,7 @@
+---
+- name: Get hostname
+  hosts: all
+
+  tasks:
+  - name: Get hostname
+    shell: hostname >> /root/hostname.txt
