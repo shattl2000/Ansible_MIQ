@@ -1,7 +1,7 @@
 ---
-- name: Get hostname workers
+- name: Get hostname
   hosts: all
 
   tasks:
   - name: Get hostname
-    shell: hostname >> /root/hostname_worker.txt
+    shell: hostname > /root/hostname.txt
