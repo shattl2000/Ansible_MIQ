@@ -1,16 +1,7 @@
 ---
 - name: Get hostname workers
-  hosts: workers
+  hosts: localhost
 
   tasks:
   - name: Get hostname
     shell: hostname >> /root/hostname_worker.txt
-
-- name: Get hostname masters
-  hosts: masters
-  become_user: origin
-  gather_facts: false
-
-  tasks:
-  - name: Get join command
-    shell: hostname >> /home/origin/hostname_master.txt
