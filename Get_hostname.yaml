@@ -1,6 +1,6 @@
 ---
 - name: Get hostname workers
-  hosts: localhost
+  hosts: all
 
   tasks:
   - name: Get hostname
