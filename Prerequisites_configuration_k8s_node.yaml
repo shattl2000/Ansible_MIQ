@@ -17,6 +17,9 @@
   - name: Disabled firewall
     service: name=firewalld state=stopped enabled=no
 
+  - name: Set hostname
+    shell: hostnamectl set-hostname {{ HOSTNAME }}
+
   - name: Reboot system
     reboot:
 
