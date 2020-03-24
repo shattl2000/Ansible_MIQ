@@ -3,5 +3,7 @@
   hosts: all
 
   tasks:
+  - name: Set hostname
+    shell: hostnamectl set-hostname {{ HOSTNAME }}
   - name: Get hostname
-    shell: hostname > /root/{{ name_file }}
+    shell: hostname > /root/{{ NAME_FILE }}
