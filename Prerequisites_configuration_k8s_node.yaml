@@ -67,7 +67,7 @@
     service: name=kubelet state=started enabled=yes
  
   - name: Join cluster
-    shell: "kubeadm join {{ IP_K8S-M }}:6443 --token {{ TOKEN }} --discovery-token-ca-cert-hash sha256:{{ HASH_SHA256 }} >> node_joined.txt"
+    shell: "kubeadm join {{ IP_K8S }}:6443 --token {{ TOKEN }} --discovery-token-ca-cert-hash sha256:{{ HASH_SHA256 }} >> node_joined.txt"
     args:
       chdir: $HOME
       creates: node_joined.txt
