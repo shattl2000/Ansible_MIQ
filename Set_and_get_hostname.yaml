@@ -1,5 +1,5 @@
 ---
-- name: Get hostname
+- name: Set and get hostname
   hosts: all
 
   tasks:
