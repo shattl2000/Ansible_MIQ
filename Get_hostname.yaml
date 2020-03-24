@@ -4,4 +4,4 @@
 
   tasks:
   - name: Get hostname
-    shell: hostname > /root/hostname.txt
+    shell: hostname > /root/{{ name_file }}
