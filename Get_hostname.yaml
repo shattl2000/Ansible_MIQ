@@ -1,6 +1,6 @@
 ---
 - name: Get hostname
-  hosts: all
+  hosts: workers
 
   tasks:
   - name: Get hostname
