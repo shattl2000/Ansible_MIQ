@@ -4,16 +4,6 @@
   become: yes
 
   tasks:
-  - name: SELinux disabled
-    selinux:
-      state: disabled
-
-  - name: Disabled firewall
-    service: name=firewalld state=stopped enabled=no
-
-  - name: Reboot system
-    reboot:
-
   - name: Install the repository RPM
     yum:
       name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
@@ -34,13 +24,22 @@
   - name: Enable automatic start
     service: name="postgresql-{{ ver }}" state=started enabled=yes
 
-  - name: add new configuration to "postgresql.conf"
+  - name: Add rules firewall
+    firewalld:
+      service: postgresql
+      permanent: yes
+      state: enabled
+
+  - name: Restart firewalld
+    command: firewall-cmd --reload
+
+  - name: Add new configuration to "postgresql.conf"
     lineinfile:
       path: "/var/lib/pgsql/{{ ver }}/data/postgresql.conf"
       regexp: "^#listen_addresses"
       line: "listen_addresses = '*'"
 
-  - name: add new configuration to "pg_hba.conf"
+  - name: Add new configuration to "pg_hba.conf"
     blockinfile:
       dest: "/var/lib/pgsql/{{ ver }}/data/pg_hba.conf"
       block: |
