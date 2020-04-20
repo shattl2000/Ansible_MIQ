@@ -22,37 +22,38 @@
   - name: Install a list of packages
     yum:
       name:
-        - postgresql12
-        - postgresql12-server
+        - "postgresql{{ ver }}"
+        - "postgresql{{ ver }}-server"
         - python-psycopg2
       state: present
 
   - name: Initialize the database
-    shell: /usr/pgsql-12/bin/postgresql-12-setup initdb
+    shell: "/usr/pgsql-{{ ver }}/bin/postgresql-{{ ver }}-setup initdb"
     # command: service postgresql-12 initdb
 
   - name: Enable automatic start
-    service: name=postgresql-12 state=started enabled=yes
+    service: name="postgresql-{{ ver }}" state=started enabled=yes
 
   - name: add new configuration to "postgresql.conf"
     lineinfile:
-      path: /var/lib/pgsql/12/data/postgresql.conf
+      path: "/var/lib/pgsql/{{ ver }}/data/postgresql.conf"
       regexp: "^#listen_addresses"
       line: "listen_addresses = '*'"
 
   - name: add new configuration to "pg_hba.conf"
     blockinfile:
-      dest: /var/lib/pgsql/12/data/pg_hba.conf
+      dest: "/var/lib/pgsql/{{ ver }}/data/pg_hba.conf"
       block: |
         host    all             all             172.24.17.0/24          md5
 
   - name: Restart PostgreSQL service
-    service: name=postgresql-12 state=restarted
+    service: name="postgresql-{{ ver }}" state=restarted
 
 - name: Configuration PostgreSQL
   hosts: sql
   become: yes
   become_user: postgres
+  gather_facts: no
 
   tasks:
   - name: Create DB
