@@ -1,0 +1,73 @@
+---
+- name: Install PostgreSQL
+  hosts: sql
+  become: yes
+
+  tasks:
+  - name: SELinux disabled
+    selinux:
+      state: disabled
+
+  - name: Disabled firewall
+    service: name=firewalld state=stopped enabled=no
+
+  - name: Reboot system
+    reboot:
+
+  - name: Install the repository RPM
+    yum:
+      name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+      state: present
+
+  - name: Install a list of packages
+    yum:
+      name:
+        - postgresql12
+        - postgresql12-server
+        - python-psycopg2
+      state: present
+
+  - name: Initialize the database
+    shell: /usr/pgsql-12/bin/postgresql-12-setup initdb
+    # command: service postgresql-12 initdb
+
+  - name: Enable automatic start
+    service: name=postgresql-12 state=started enabled=yes
+
+  - name: add new configuration to "postgresql.conf"
+    lineinfile:
+      path: /var/lib/pgsql/12/data/postgresql.conf
+      regexp: "^#listen_addresses"
+      line: "listen_addresses = '*'"
+
+  - name: add new configuration to "pg_hba.conf"
+    blockinfile:
+      dest: /var/lib/pgsql/12/data/pg_hba.conf
+      block: |
+        host    all             all             172.24.17.0/24          md5
+
+  - name: Restart PostgreSQL service
+    service: name=postgresql-12 state=restarted
+
+- name: Configuration PostgreSQL
+  hosts: sql
+  become: yes
+  become_user: postgres
+
+  tasks:
+  - name: Create DB
+    postgresql_db:
+      name: "{{ db_name }}"
+      encoding: UTF-8
+
+  - name: Create user and set access to database
+    postgresql_user:
+      db: "{{ db_name }}"
+      name: "{{ db_user }}"
+      password: "{{ db_password }}"
+      priv: ALL
+
+  - name: Set privilege user
+    postgresql_user:
+      name: "{{ db_user }}"
+      role_attr_flags: CREATEDB,SUPERUSER
