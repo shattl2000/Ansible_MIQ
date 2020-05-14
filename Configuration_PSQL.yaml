@@ -1,24 +1,23 @@
 ---
-- name: Install PostgreSQL
+- name: Configuration PostgreSQL
   hosts: all
   become: yes
 
   tasks:
-  - name: Initialize the database
-    shell: "/usr/pgsql-{{ ver }}/bin/postgresql-{{ ver }}-setup initdb"
-    # command: service postgresql-12 initdb
+#   - name: Initialize the database
+#     shell: "/usr/pgsql-{{ ver }}/bin/postgresql-{{ ver }}-setup initdb"
 
-  - name: Enable automatic start
-    service: name="postgresql-{{ ver }}" state=started enabled=yes
+#   - name: Enable automatic start
+#     service: name="postgresql-{{ ver }}" state=started enabled=yes
 
-  - name: Add rules firewall
-    firewalld:
-      service: postgresql
-      permanent: yes
-      state: enabled
+#   - name: Add rules firewall
+#     firewalld:
+#       service: postgresql
+#       permanent: yes
+#       state: enabled
 
-  - name: Restart firewalld
-    command: firewall-cmd --reload
+#   - name: Restart firewalld
+#     command: firewall-cmd --reload
 
   - name: Add new configuration to "postgresql.conf"
     lineinfile:
