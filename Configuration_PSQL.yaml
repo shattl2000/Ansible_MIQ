@@ -4,11 +4,11 @@
   become: yes
 
   tasks:
-#   - name: Initialize the database
-#     shell: "/usr/pgsql-{{ ver }}/bin/postgresql-{{ ver }}-setup initdb"
+  - name: Initialize the database
+    shell: "/usr/pgsql-{{ ver }}/bin/postgresql-{{ ver }}-setup initdb"
 
-#   - name: Enable automatic start
-#     service: name="postgresql-{{ ver }}" state=started enabled=yes
+  - name: Enable automatic start
+    service: name="postgresql-{{ ver }}" state=started enabled=yes
 
 #   - name: Add rules firewall
 #     firewalld:
