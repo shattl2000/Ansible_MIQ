@@ -1,0 +1,60 @@
+---
+- name: Install PostgreSQL
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: Initialize the database
+    shell: "/usr/pgsql-{{ ver }}/bin/postgresql-{{ ver }}-setup initdb"
+    # command: service postgresql-12 initdb
+
+  - name: Enable automatic start
+    service: name="postgresql-{{ ver }}" state=started enabled=yes
+
+  - name: Add rules firewall
+    firewalld:
+      service: postgresql
+      permanent: yes
+      state: enabled
+
+  - name: Restart firewalld
+    command: firewall-cmd --reload
+
+  - name: Add new configuration to "postgresql.conf"
+    lineinfile:
+      path: "/var/lib/pgsql/{{ ver }}/data/postgresql.conf"
+      regexp: "^#listen_addresses"
+      line: "listen_addresses = '*'"
+
+  - name: Add new configuration to "pg_hba.conf"
+    blockinfile:
+      dest: "/var/lib/pgsql/{{ ver }}/data/pg_hba.conf"
+      block: |
+        host    all             all             172.24.17.0/24          md5
+        host    all             all             10.255.40.0/24          md5
+  - name: Restart PostgreSQL service
+    service: name="postgresql-{{ ver }}" state=restarted
+
+- name: Configuration PostgreSQL
+  hosts: sql
+  become: yes
+  become_user: postgres
+  gather_facts: no
+
+  tasks:
+  - name: Create DB
+    postgresql_db:
+      name: "{{ db_name }}"
+      encoding: UTF-8
+
+  - name: Create user and set access to database
+    postgresql_user:
+      db: "{{ db_name }}"
+      name: "{{ db_user }}"
+      password: "{{ db_password }}"
+      priv: ALL
+
+  - name: Set privilege user
+    postgresql_user:
+      name: "{{ db_user }}"
+      role_attr_flags: CREATEDB,SUPERUSER
