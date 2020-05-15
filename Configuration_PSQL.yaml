@@ -1,6 +1,6 @@
 ---
 - name: Configuration PostgreSQL
-  hosts: all
+  hosts: sql
   become: yes
 
   tasks:
@@ -35,7 +35,7 @@
     service: name="postgresql-{{ ver }}" state=restarted
 
 - name: Configuration PostgreSQL
-  hosts: all
+  hosts: sql
   become: yes
   become_user: postgres
   gather_facts: no
