@@ -1,10 +1,4 @@
 ---
-- name: Sleep
-  tasks:
-  - name: sleep for 600 seconds and continue with play
-    wait_for:
-      timeout: 600
-    delegate_to: localhost
 
 - name: Configuration PostgreSQL
   hosts: sql
@@ -12,6 +6,11 @@
   gather_facts: no
 
   tasks:
+  - name: sleep for 600 seconds and continue with play
+    wait_for:
+      timeout: 600
+    delegate_to: localhost
+    
   - name: Initialize the database
     shell: "/usr/pgsql-{{ ver }}/bin/postgresql-{{ ver }}-setup initdb"
 
