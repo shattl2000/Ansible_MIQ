@@ -1,5 +1,4 @@
 ---
-
 - name: Configuration PostgreSQL
   hosts: sql
   become: yes
