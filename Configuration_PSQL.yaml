@@ -2,6 +2,7 @@
 - name: Configuration PostgreSQL
   hosts: sql
   become: yes
+  gather_facts: no
 
   tasks:
   - name: Initialize the database
