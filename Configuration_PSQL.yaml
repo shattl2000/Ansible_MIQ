@@ -5,10 +5,13 @@
 #   gather_facts: no
 
   tasks:
-  - name: sleep for 300 seconds and continue with play
-    wait_for:
-      timeout: 300
-    delegate_to: localhost
+  - name: Wait for system to become reachable
+    wait_for_connection:
+  
+#   - name: sleep for 300 seconds and continue with play
+#     wait_for:
+#       timeout: 300
+#     delegate_to: localhost
     
   - name: Initialize the database
     shell: "/usr/pgsql-{{ ver }}/bin/postgresql-{{ ver }}-setup initdb"
